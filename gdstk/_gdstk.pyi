@@ -1,7 +1,7 @@
 import pathlib
 import datetime
 import sys
-from typing import Optional, Iterable, Any
+from typing import Optional, Iterable, Any, List, Dict, Tuple, Set, Union
 from collections.abc import Callable, Sequence
 
 if sys.version_info >= (3, 8):
@@ -18,31 +18,31 @@ import numpy
 from numpy.typing import ArrayLike # type: ignore
 
 class Cell:
-    labels: list[Label]
+    labels: List[Label]
     name: str
-    paths: list[FlexPath | RobustPath]
-    polygons: list[Polygon]
-    properties: list[list[str | bytes | float]]
-    references: list[Reference]
+    paths: List[Union[FlexPath, RobustPath]]
+    polygons: List[Polygon]
+    properties: List[List[Union[str, bytes, float]]]
+    references: List[Reference]
     def __init__(self, name: str) -> None: ...
-    def add(self, *elements: Polygon | FlexPath | RobustPath | Label | Reference) -> Self: ...
-    def area(self, by_spec: bool = False) -> float | dict[tuple[int, int], float]: ...
-    def bounding_box(self) -> Optional[tuple[tuple[float, float], tuple[float, float]]]: ...
+    def add(self, *elements: Union[Polygon, FlexPath, RobustPath, Label, Reference]) -> Self: ...
+    def area(self, by_spec: bool = False) -> Union[float, Dict[Tuple[int, int], float]]: ...
+    def bounding_box(self) -> Optional[Tuple[Tuple[float, float], Tuple[float, float]]]: ...
     def convex_hull(self) -> numpy.ndarray[Any, numpy.dtype[numpy.float64]]: ...
     def copy(
         self,
         name: str,
-        translation: tuple[float, float] | complex = (0, 0),
+        translation: Union[Tuple[float, float], complex] = (0, 0),
         rotation: float = 0,
         magnification: float = 1,
         x_reflection: bool = False,
         deep_copy: bool = True,
     ) -> Cell: ...
     def delete_property(self, name: str) -> Self: ...
-    def dependencies(self, recursive: bool = True) -> Sequence[Cell | RawCell]: ...
+    def dependencies(self, recursive: bool = True) -> Sequence[Union[Cell, RawCell]]: ...
     def filter(
         self,
-        spec: Iterable[tuple[int, int]],
+        spec: Iterable[Tuple[int, int]],
         remove: bool = True,
         polygons: bool = True,
         paths: bool = True,
@@ -55,14 +55,14 @@ class Cell:
         depth: Optional[int] = None,
         layer: Optional[int] = None,
         texttype: Optional[int] = None,
-    ) -> list[Label]: ...
+    ) -> List[Label]: ...
     def get_paths(
         self,
         apply_repetitions: bool = True,
         depth: Optional[int] = None,
         layer: Optional[int] = None,
         datatype: Optional[int] = None,
-    ) -> list[RobustPath | FlexPath]: ...
+    ) -> List[Union[RobustPath, FlexPath]]: ...
     def get_polygons(
         self,
         apply_repetitions: bool = True,
@@ -70,51 +70,51 @@ class Cell:
         depth: Optional[int] = None,
         layer: Optional[int] = None,
         datatype: Optional[int] = None,
-    ) -> list[Polygon]: ...
-    def get_property(self, name: str) -> Optional[list[list[str | bytes | float]]]: ...
-    def remove(self, *elements: Label | Polygon | RobustPath | FlexPath | Reference) -> Self: ...
+    ) -> List[Polygon]: ...
+    def get_property(self, name: str) -> Optional[List[List[Union[str, bytes, float]]]]: ...
+    def remove(self, *elements: Union[Label, Polygon, RobustPath, FlexPath, Reference]) -> Self: ...
     def set_property(
-        self, name: str, value: str | bytes | float | Sequence[str | bytes | float]
+        self, name: str, value: Union[str, bytes, float, Sequence[Union[str, bytes, float]]]
     ) -> Self: ...
     def write_svg(
         self,
-        outfile: str | pathlib.Path,
+        outfile: Union[str, pathlib.Path],
         scaling: float = 10,
         precision: int = 6,
-        shape_style: Optional[dict[tuple[int, int], dict[str, str]]] = None,
-        label_style: Optional[dict[tuple[int, int], dict[str, str]]] = None,
+        shape_style: Optional[Dict[Tuple[int, int], Dict[str, str]]] = None,
+        label_style: Optional[Dict[Tuple[int, int], Dict[str, str]]] = None,
         background: str = "#222222",
-        pad: float | str = "5%",
+        pad: Union[float, str] = "5%",
         sort_function: Optional[Callable[[Polygon, Polygon], bool]] = None,
     ) -> Self: ...
 
 class Curve:
     tolerance: float
-    def __init__(self, xy: tuple[float, float] | complex, tolerance: float = 0.01) -> None: ...
+    def __init__(self, xy: Union[Tuple[float, float], complex], tolerance: float = 0.01) -> None: ...
     def arc(
         self,
-        radius: float | tuple[float, float],
+        radius: Union[float, Tuple[float, float]],
         initial_angle: float,
         final_angle: float,
         rotation: float = 0,
     ) -> Self: ...
     def bezier(
-        self, xy: Sequence[tuple[float, float] | complex], relative: bool = False
+        self, xy: Sequence[Union[Tuple[float, float], complex]], relative: bool = False
     ) -> Self: ...
-    def commands(self, *args: float | str) -> Self: ...
+    def commands(self, *args: Union[float, str]) -> Self: ...
     def cubic(
-        self, xy: Sequence[tuple[float, float] | complex], relative: bool = False
+        self, xy: Sequence[Union[Tuple[float, float], complex]], relative: bool = False
     ) -> Self: ...
     def cubic_smooth(
-        self, xy: Sequence[tuple[float, float] | complex], relative: bool = False
+        self, xy: Sequence[Union[Tuple[float, float], complex]], relative: bool = False
     ) -> Self: ...
-    def horizontal(self, x: Sequence[float] | float, relative: bool = False) -> Self: ...
+    def horizontal(self, x: Union[Sequence[float], float], relative: bool = False) -> Self: ...
     def interpolation(
         self,
-        points: Sequence[tuple[float, float]],
+        points: Sequence[Tuple[float, float]],
         angles: Optional[Sequence[float]] = None,
-        tension_in: float | Sequence[float] = 1,
-        tension_out: float | Sequence[float] = 1,
+        tension_in: Union[float, Sequence[float]] = 1,
+        tension_out: Union[float, Sequence[float]] = 1,
         initial_curl: float = 1,
         final_curl: float = 1,
         cycle: bool = False,
@@ -122,23 +122,23 @@ class Curve:
     ) -> Self: ...
     def parametric(
         self,
-        curve_function: Callable[[float], tuple[float, float] | complex],
+        curve_function: Callable[[float], Union[Tuple[float, float], complex]],
         relative: bool = True,
     ) -> Self: ...
     def points(self) -> numpy.ndarray[Any, numpy.dtype[numpy.float64]]: ...
     def quadratic(
-        self, xy: Sequence[tuple[float, float] | complex], relative: bool = False
+        self, xy: Sequence[Union[Tuple[float, float], complex]], relative: bool = False
     ) -> Self: ...
     def quadratic_smooth(
-        self, xy: Sequence[tuple[float, float] | complex], relative: bool = False
+        self, xy: Sequence[Union[Tuple[float, float], complex]], relative: bool = False
     ) -> Self: ...
     def segment(
         self,
-        xy: tuple[float, float] | complex | Sequence[tuple[float, float] | complex],
+        xy: Union[Tuple[float, float, complex], Sequence[Union[Tuple[float, float], complex]]],
         relative: bool = False,
     ) -> Self: ...
     def turn(self, radius: float, angle: float) -> Self: ...
-    def vertical(self, y: float | Sequence[float], relative: bool = False) -> Self: ...
+    def vertical(self, y: Union[float, Sequence[float]], relative: bool = False) -> Self: ...
 
 class RaithData:
     base_cell_name: str
@@ -162,25 +162,20 @@ class RaithData:
     ) -> None: ...
 
 class FlexPath:
-    bend_function: tuple[
-        Optional[Callable[[float, float, float, float], list[tuple[float, float]]]], ...
+    bend_function: Tuple[
+        Optional[Callable[[float, float, float, float], List[Tuple[float, float]]]], ...
     ]
-    bend_radius: tuple[float, ...]
-    datatypes: tuple[int, ...]
-    ends: tuple[
-        Literal["flush", "extended", "round", "smooth"]
-        | tuple[float, float]
-        | Callable[[float, float, float, float], list[tuple[float, float]]],
-        ...,
-    ]
-    joins: tuple[
-        Literal["natural", "miter", "bevel", "round", "smooth"]
-        | Callable[[float, float, float, float, float, float], list[tuple[float, float]]],
-        ...,
-    ]
-    layers: tuple[int, ...]
+    bend_radius: Tuple[float, ...]
+    datatypes: Tuple[int, ...]
+    ends: Tuple[
+        Union[Literal["flush", "extended", "round", "smooth", Tuple[float, float]], Callable[[float, float, float, float], List[Tuple[float, float]]]],
+        ...]
+    joins: Tuple[
+        Union[Literal["natural", "miter", "bevel", "round", "smooth"], Callable[[float, float, float, float, float, float], List[Tuple[float, float]]]],
+        ...]
+    layers: Tuple[int, ...]
     num_paths: int
-    properties: list[list[str | bytes | float]]
+    properties: List[List[Union[str, bytes, float]]]
     repetition: Repetition
     scale_width: bool
     simple_path: bool
@@ -189,173 +184,161 @@ class FlexPath:
     raith_data: RaithData
     def __init__(
         self,
-        points: tuple[float, float] | complex | Sequence[tuple[float, float] | complex],
-        width: float | Sequence[float],
-        offset: float | Sequence[float] = 0,
-        joins: Literal["natural", "miter", "bevel", "round", "smooth"]
-        | Callable[
-            [float, float, float, float, float, float], Sequence[tuple[float, float] | complex]
-        ]
-        | Sequence[
-            Literal["natural", "miter", "bevel", "round", "smooth"]
-            | Callable[
-                [float, float, float, float, float, float], Sequence[tuple[float, float] | complex]
-            ]
-        ] = "natural",
-        ends: Literal["flush", "extended", "round", "smooth"]
-        | tuple[float, float]
-        | Callable[[float, float, float, float], Sequence[tuple[float, float] | complex]]
-        | Sequence[
-            Literal["flush", "extended", "round", "smooth"]
-            | tuple[float, float]
-            | Callable[[float, float, float, float], Sequence[tuple[float, float] | complex]]
-        ] = "flush",
-        bend_radius: float | Sequence[float] = 0,
-        bend_function: Optional[
-            Callable[[float, float, float, float], Sequence[tuple[float, float] | complex]]
-        ]
-        | Sequence[
-            Callable[[float, float, float, float], Sequence[tuple[float, float] | complex]]
-        ] = None,
+        points: Union[Tuple[float, float, complex], Sequence[Union[Tuple[float, float], complex]]],
+        width: Union[float, Sequence[float]],
+        offset: Union[float, Sequence[float]] = 0,
+        joins: Union[Literal["natural", "miter", "bevel", "round", "smooth", Callable[
+            [float, float, float, float, float, float], Sequence[Union[Tuple[float, float], complex]]
+        ]], Sequence[
+            Union[Literal["natural", "miter", "bevel", "round", "smooth"], Callable[
+                [float, float, float, float, float, float], Sequence[Union[Tuple[float, float], complex]]
+            ]]
+        ]] = "natural",
+        ends: Union[Union[Literal["flush", "extended", "round", "smooth", Tuple[float, float]], Callable[[float, float, float, float], Sequence[Union[Tuple[float, float], complex]]]], Sequence[
+            Union[Literal["flush", "extended", "round", "smooth", Tuple[float, float]], Callable[[float, float, float, float], Sequence[Union[Tuple[float, float], complex]]]]
+        ]] = "flush",
+        bend_radius: Union[float, Sequence[float]] = 0,
+        bend_function: Union[Optional[
+            Callable[[float, float, float, float], Sequence[Union[Tuple[float, float], complex]]]
+        ], Sequence[
+            Callable[[float, float, float, float], Sequence[Union[Tuple[float, float], complex]]]
+        ]] = None,
         tolerance: float = 1e-2,
         simple_path: bool = False,
         scale_width: bool = True,
-        layer: int | Sequence[int] = 0,
-        datatype: int | Sequence[int] = 0,
+        layer: Union[int, Sequence[int]] = 0,
+        datatype: Union[int, Sequence[int]] = 0,
     ) -> None: ...
-    def apply_repetition(self) -> list[Self]: ...
+    def apply_repetition(self) -> List[Self]: ...
     def arc(
         self,
-        radius: float | tuple[float, float],
+        radius: Union[float, Tuple[float, float]],
         initial_angle: float,
         final_angle: float,
         rotation: float = 0,
-        width: Optional[float] | Sequence[float] = None,
-        offset: Optional[float] | Sequence[float] = None,
+        width: Union[Optional[float], Sequence[float]] = None,
+        offset: Union[Optional[float], Sequence[float]] = None,
     ) -> Self: ...
     def bezier(
         self,
-        xy: Sequence[tuple[float, float] | complex],
-        width: Optional[float] | Sequence[float] = None,
-        offset: Optional[float] | Sequence[float] = None,
+        xy: Sequence[Union[Tuple[float, float], complex]],
+        width: Union[Optional[float], Sequence[float]] = None,
+        offset: Union[Optional[float], Sequence[float]] = None,
         relative: bool = False,
     ) -> Self: ...
-    def commands(self, *args: str | float) -> Self: ...
+    def commands(self, *args: Union[str, float]) -> Self: ...
     def copy(self) -> Self: ...
     def cubic(
         self,
-        xy: Sequence[tuple[float, float] | complex],
-        width: Optional[float] | Sequence[float] = None,
-        offset: Optional[float] | Sequence[float] = None,
+        xy: Sequence[Union[Tuple[float, float], complex]],
+        width: Union[Optional[float], Sequence[float]] = None,
+        offset: Union[Optional[float], Sequence[float]] = None,
         relative: bool = False,
     ) -> Self: ...
     def cubic_smooth(
         self,
-        xy: Sequence[tuple[float, float] | complex],
-        width: Optional[float] | Sequence[float] = None,
-        offset: Optional[float] | Sequence[float] = None,
+        xy: Sequence[Union[Tuple[float, float], complex]],
+        width: Union[Optional[float], Sequence[float]] = None,
+        offset: Union[Optional[float], Sequence[float]] = None,
         relative: bool = False,
     ) -> Self: ...
     def delete_gds_property(self, attr: int) -> Self: ...
     def delete_property(self, name: str) -> Self: ...
     def get_gds_property(self, attr: int) -> Optional[str]: ...
-    def get_property(self, name: str) -> Optional[list[list[str | bytes | float]]]: ...
+    def get_property(self, name: str) -> Optional[List[List[Union[str, bytes, float]]]]: ...
     def horizontal(
         self,
-        x: float | Sequence[float],
-        width: Optional[float] | Sequence[float] = None,
-        offset: Optional[float] | Sequence[float] = None,
+        x: Union[float, Sequence[float]],
+        width: Union[Optional[float], Sequence[float]] = None,
+        offset: Union[Optional[float], Sequence[float]] = None,
         relative: bool = False,
     ) -> Self: ...
     def interpolation(
         self,
-        points: Sequence[tuple[float, float] | complex],
+        points: Sequence[Union[Tuple[float, float], complex]],
         angles: Optional[Sequence[float]] = None,
-        tension_in: float | Sequence[float] = 1,
-        tension_out: float | Sequence[float] = 1,
+        tension_in: Union[float, Sequence[float]] = 1,
+        tension_out: Union[float, Sequence[float]] = 1,
         initial_curl: float = 1,
         final_curl: float = 1,
         cycle: bool = False,
-        width: Optional[float] | Sequence[float] = None,
-        offset: Optional[float] | Sequence[float] = None,
+        width: Union[Optional[float], Sequence[float]] = None,
+        offset: Union[Optional[float], Sequence[float]] = None,
         relative: bool = False,
     ) -> Self: ...
     def mirror(
-        self, p1: tuple[float, float] | complex, p2: tuple[float, float] | complex = (0, 0)
+        self, p1: Union[Tuple[float, float], complex], p2: Union[Tuple[float, float], complex] = (0, 0)
     ) -> Self: ...
     def offsets(self) -> numpy.ndarray[Any, numpy.dtype[numpy.float64]]: ...
     def parametric(
         self,
-        path_function: Callable[[float], tuple[float, float] | complex],
-        width: Optional[float] | Sequence[float] = None,
-        offset: Optional[float] | Sequence[float] = None,
+        path_function: Callable[[float], Union[Tuple[float, float], complex]],
+        width: Union[Optional[float], Sequence[float]] = None,
+        offset: Union[Optional[float], Sequence[float]] = None,
         relative: bool = True,
     ) -> Self: ...
-    def path_spines(self) -> list[numpy.ndarray[Any, numpy.dtype[numpy.float64]]]: ...
+    def path_spines(self) -> List[numpy.ndarray[Any, numpy.dtype[numpy.float64]]]: ...
     def quadratic(
         self,
-        xy: Sequence[tuple[float, float] | complex],
-        width: Optional[float] | Sequence[float] = None,
-        offset: Optional[float] | Sequence[float] = None,
+        xy: Sequence[Union[Tuple[float, float], complex]],
+        width: Union[Optional[float], Sequence[float]] = None,
+        offset: Union[Optional[float], Sequence[float]] = None,
         relative: bool = False,
     ) -> Self: ...
     def quadratic_smooth(
         self,
-        xy: Sequence[tuple[float, float] | complex],
-        width: Optional[float] | Sequence[float] = None,
-        offset: Optional[float] | Sequence[float] = None,
+        xy: Sequence[Union[Tuple[float, float], complex]],
+        width: Union[Optional[float], Sequence[float]] = None,
+        offset: Union[Optional[float], Sequence[float]] = None,
         relative: bool = False,
     ) -> Self: ...
-    def rotate(self, angle: float, center: tuple[float, float] | complex = (0, 0)) -> Self: ...
-    def scale(self, s: float, center: tuple[float, float] | complex = (0, 0)) -> Self: ...
+    def rotate(self, angle: float, center: Union[Tuple[float, float], complex] = (0, 0)) -> Self: ...
+    def scale(self, s: float, center: Union[Tuple[float, float], complex] = (0, 0)) -> Self: ...
     def segment(
         self,
-        xy: Sequence[tuple[float, float] | complex] | tuple[float, float] | complex,
-        width: Optional[float] | Sequence[float] = None,
-        offset: Optional[float] | Sequence[float] = None,
+        xy: Union[Sequence[Union[Tuple[float, float, complex]], Tuple[float, float]], complex],
+        width: Union[Optional[float], Sequence[float]] = None,
+        offset: Union[Optional[float], Sequence[float]] = None,
         relative: bool = False,
     ) -> Self: ...
     def set_bend_function(
         self,
-        functions: Optional[Callable[[float, float, float, float], Sequence[tuple[float, float]]]],
+        functions: Optional[Callable[[float, float, float, float], Sequence[Tuple[float, float]]]],
     ) -> Self: ...
     def set_bend_radius(self, *radii: Optional[float]) -> Self: ...
     def set_datatypes(self, *datatypes: int) -> Self: ...
     def set_ends(
         self,
-        *ends: Literal["flush", "extended", "round", "smooth"]
-        | tuple[float, float]
-        | Callable[[float, float, float, float], Sequence[float]],
+        *ends: Union[Literal["flush", "extended", "round", "smooth", Tuple[float, float]], Callable[[float, float, float, float], Sequence[float]]],
     ) -> Self: ...
     def set_gds_property(self, attr: int, value: str) -> Self: ...
     def set_joins(
         self,
-        *joins: Literal["natural", "miter", "bevel", "round", "smooth"]
-        | Callable[
-            [float, float, float, float, float, float], Sequence[tuple[float, float] | complex]
-        ],
+        *joins: Union[Literal["natural", "miter", "bevel", "round", "smooth"], Callable[
+            [float, float, float, float, float, float], Sequence[Union[Tuple[float, float], complex]]
+        ]],
     ) -> Self: ...
     def set_layers(self, *layers: int) -> Self: ...
     def set_property(
-        self, name: str, value: str | bytes | float | Sequence[str | bytes | float]
+        self, name: str, value: Union[str, bytes, float, Sequence[Union[str, bytes, float]]]
     ) -> Self: ...
     def spine(self) -> numpy.ndarray[Any, numpy.dtype[numpy.float64]]: ...
-    def to_polygons(self) -> list[Polygon]: ...
+    def to_polygons(self) -> List[Polygon]: ...
     def translate(
-        self, dx: float | tuple[float, float] | complex, dy: Optional[float] = None
+        self, dx: Union[Union[float, Tuple[float, float]], complex], dy: Optional[float] = None
     ) -> Self: ...
     def turn(
         self,
         radius: float,
         angle: float,
-        width: Optional[float] | Sequence[float] = None,
-        offset: Optional[float] | Sequence[float] = None,
+        width: Union[Optional[float], Sequence[float]] = None,
+        offset: Union[Optional[float], Sequence[float]] = None,
     ) -> Self: ...
     def vertical(
         self,
-        y: float | Sequence[float],
-        width: Optional[float] | Sequence[float] = None,
-        offset: Optional[float] | Sequence[float] = None,
+        y: Union[float, Sequence[float]],
+        width: Union[Optional[float], Sequence[float]] = None,
+        offset: Union[Optional[float], Sequence[float]] = None,
         relative: bool = False,
     ) -> Self: ...
     def widths(self) -> numpy.ndarray[Any, numpy.dtype[numpy.float64]]: ...
@@ -363,7 +346,7 @@ class FlexPath:
 class GdsWriter:
     def __init__(
         self,
-        outfile: str | pathlib.Path,
+        outfile: Union[str, pathlib.Path],
         name: str = "library",
         unit: float = 1e-6,
         precision: float = 1e-9,
@@ -371,14 +354,14 @@ class GdsWriter:
         timestamp: Optional[datetime.datetime] = None,
     ) -> None: ...
     def close(self) -> None: ...
-    def write(self, *cells: Cell | RawCell) -> Self: ...
+    def write(self, *cells: Union[Cell, RawCell]) -> Self: ...
 
 class Label:
     anchor: Literal["n", "s", "e", "w", "ne", "nw", "se", "sw", "o"]
     layer: int
     magnification: float
-    origin: tuple[float, float]
-    properties: list[list[str | bytes | float]]
+    origin: Tuple[float, float]
+    properties: List[List[Union[str, bytes, float]]]
     repetition: Repetition
     rotation: float
     text: str
@@ -387,7 +370,7 @@ class Label:
     def __init__(
         self,
         text: str,
-        origin: tuple[float, float] | complex,
+        origin: Union[Tuple[float, float], complex],
         anchor: Literal["n", "s", "e", "w", "ne", "nw", "se", "sw", "o"] = "o",
         rotation: float = 0,
         magnification: float = 1,
@@ -395,48 +378,48 @@ class Label:
         layer: int = 0,
         texttype: int = 0,
     ) -> None: ...
-    def apply_repetition(self) -> list[Self]: ...
+    def apply_repetition(self) -> List[Self]: ...
     def copy(self) -> Self: ...
     def delete_gds_property(self, attr: int) -> Self: ...
     def delete_property(self, name: str) -> Self: ...
     def get_gds_property(self, attr: int) -> Optional[str]: ...
-    def get_property(self, name: str) -> Optional[list[list[str | bytes | float]]]: ...
+    def get_property(self, name: str) -> Optional[List[List[Union[str, bytes, float]]]]: ...
     def set_gds_property(self, attr: int, value: str) -> Self: ...
     def set_property(
-        self, name: str, value: str | bytes | float | Sequence[str | bytes | float]
+        self, name: str, value: Union[str, bytes, float, Sequence[Union[str, bytes, float]]]
     ) -> Self: ...
 
 class Library:
-    cells: list[Cell | RawCell]
+    cells: List[Union[Cell, RawCell]]
     name: str
     precision: float
-    properties: list[list[str | bytes | float]]
+    properties: List[List[Union[str, bytes, float]]]
     unit: float
     def __init__(
         self, name: str = "library", unit: float = 1e-6, precision: float = 1e-9
     ) -> None: ...
-    def add(self, *cells: Cell | RawCell) -> Self: ...
+    def add(self, *cells: Union[Cell, RawCell]) -> Self: ...
     def delete_property(self, name: str) -> Self: ...
-    def get_property(self, name: str) -> Optional[list[list[str | bytes | float]]]: ...
-    def layers_and_datatypes(self) -> set[tuple[int, int]]: ...
-    def layers_and_texttypes(self) -> set[tuple[int, int]]: ...
+    def get_property(self, name: str) -> Optional[List[List[Union[str, bytes, float]]]]: ...
+    def layers_and_datatypes(self) -> Set[Tuple[int, int]]: ...
+    def layers_and_texttypes(self) -> Set[Tuple[int, int]]: ...
     def new_cell(self, name: str) -> Cell: ...
-    def remove(self, *cells: Cell | RawCell) -> Self: ...
+    def remove(self, *cells: Union[Cell, RawCell]) -> Self: ...
     def rename_cell(self, old_name: str, new_name: str) -> Self: ...
-    def replace(self, *cells: Cell | RawCell) -> Self: ...
+    def replace(self, *cells: Union[Cell, RawCell]) -> Self: ...
     def set_property(
-        self, name: str, value: str | bytes | float | Sequence[str | bytes | float]
+        self, name: str, value: Union[str, bytes, float, Sequence[Union[str, bytes, float]]]
     ) -> Self: ...
-    def top_level(self) -> list[Cell | RawCell]: ...
+    def top_level(self) -> List[Union[Cell, RawCell]]: ...
     def write_gds(
         self,
-        outfile: str | pathlib.Path,
+        outfile: Union[str, pathlib.Path],
         max_points: int = 199,
         timestamp: Optional[datetime.datetime] = None,
     ) -> None: ...
     def write_oas(
         self,
-        outfile: str | pathlib.Path,
+        outfile: Union[str, pathlib.Path],
         compression_level: int = 6,
         detect_rectangles: bool = True,
         detect_trapezoids: bool = True,
@@ -448,69 +431,69 @@ class Library:
 class Polygon:
     datatype: int
     layer: int
-    points: list[tuple[float, float]]
-    properties: list[list[str | bytes | float]]
+    points: List[Tuple[float, float]]
+    properties: List[List[Union[str, bytes, float]]]
     repetition: Repetition
     size: int
     def __init__(
-        self, points: Sequence[tuple[float, float] | complex], layer: int = 0, datatype: int = 0
+        self, points: Sequence[Union[Tuple[float, float], complex]], layer: int = 0, datatype: int = 0
     )-> None: ...
-    def apply_repetition(self) -> list[Self]: ...
+    def apply_repetition(self) -> List[Self]: ...
     def area(self) -> float: ...
     def perimeter(self) -> float: ...
-    def bounding_box(self) -> tuple[tuple[float, float], tuple[float, float]]: ...
-    def contain(self, *points: tuple[float, float] | complex) -> bool | tuple[bool, ...]: ...
-    def contain_all(self, *points: tuple[float, float] | complex) -> bool: ...
-    def contain_any(self, *points: tuple[float, float] | complex) -> bool: ...
+    def bounding_box(self) -> Tuple[Tuple[float, float], Tuple[float, float]]: ...
+    def contain(self, *points: Union[Tuple[float, float], complex]) -> Union[bool, Tuple[bool, ...]]: ...
+    def contain_all(self, *points: Union[Tuple[float, float], complex]) -> bool: ...
+    def contain_any(self, *points: Union[Tuple[float, float], complex]) -> bool: ...
     def copy(self) -> Self: ...
     def delete_gds_property(self, attr: int) -> Self: ...
     def delete_property(self, name: str) -> Self: ...
-    def fillet(self, radius: float | Sequence[float], tolerance: float = 0.01) -> Self: ...
-    def fracture(self, max_points: int = 199, precision: float = 1e-3) -> list[Polygon]: ...
+    def fillet(self, radius: Union[float, Sequence[float]], tolerance: float = 0.01) -> Self: ...
+    def fracture(self, max_points: int = 199, precision: float = 1e-3) -> List[Polygon]: ...
     def get_gds_property(self, attr: int) -> Optional[str]: ...
-    def get_property(self, name: str) -> Optional[list[list[str | bytes | float]]]: ...
+    def get_property(self, name: str) -> Optional[List[List[Union[str, bytes, float]]]]: ...
     def mirror(
-        self, p1: tuple[float, float] | complex, p2: tuple[float, float] | complex = (0, 0)
+        self, p1: Union[Tuple[float, float], complex], p2: Union[Tuple[float, float], complex] = (0, 0)
     ) -> Self: ...
-    def rotate(self, angle: float, center: tuple[float, float] | complex = (0, 0)) -> Self: ...
+    def rotate(self, angle: float, center: Union[Tuple[float, float], complex] = (0, 0)) -> Self: ...
     def scale(
-        self, sx: float, sy: float = 0, center: tuple[float, float] | complex = (0, 0)
+        self, sx: float, sy: float = 0, center: Union[Tuple[float, float], complex] = (0, 0)
     ) -> Self: ...
     def set_gds_property(self, attr: int, value: str) -> Self: ...
     def set_property(
-        self, name: str, value: str | bytes | float | Sequence[str | bytes | float]
+        self, name: str, value: Union[str, bytes, float, Sequence[Union[str, bytes, float]]]
     ) -> Self: ...
     def transform(
         self,
         magnification: float = 1,
         x_reflection: bool = False,
         rotation: float = 0,
-        translation: Optional[tuple[float, float] | complex] = None,
+        translation: Optional[Union[Tuple[float, float], complex]] = None,
         matrix: Optional[ArrayLike] = None, # type: ignore
     ) -> Self: ...
     def translate(
-        self, dx: float | tuple[float, float] | complex, dy: Optional[float] = None
+        self, dx: Union[Union[float, Tuple[float, float]], complex], dy: Optional[float] = None
     ) -> Self: ...
 
 class RawCell:
     name: str
     size: int
     def __init__(self, name: str)-> None: ...
-    def dependencies(self, recursive: bool = True) -> list[RawCell]: ...
+    def dependencies(self, recursive: bool = True) -> List[RawCell]: ...
 
 class Reference:
     cell: Cell
     cell_name: str
     magnification: float
-    origin: tuple[float, float]
-    properties: list[list[str | bytes | float]]
+    origin: Tuple[float, float]
+    properties: List[List[Union[str, bytes, float]]]
     repetition: Repetition
     rotation: float
     x_reflection: bool
     def __init__(
         self,
         cell: Cell,
-        origin: tuple[float, float] | complex = (0, 0),
+        origin: Union[Tuple[float, float], complex] = (0, 0),
         rotation: float = 0,
         magnification: float = 1,
         x_reflection: bool = False,
@@ -518,8 +501,8 @@ class Reference:
         rows: int = 1,
         spacing: Optional[Sequence[float]] = ...,
     )-> None: ...
-    def apply_repetition(self) -> list[Self]: ...
-    def bounding_box(self) -> tuple[tuple[float, float], tuple[float, float]]: ...
+    def apply_repetition(self) -> List[Self]: ...
+    def bounding_box(self) -> Tuple[Tuple[float, float], Tuple[float, float]]: ...
     def convex_hull(self) -> numpy.ndarray[Any, numpy.dtype[numpy.float64]]: ...
     def copy(self) -> Self: ...
     def delete_gds_property(self, attr: int) -> Self: ...
@@ -531,14 +514,14 @@ class Reference:
         depth: Optional[int] = None,
         layer: Optional[int] = None,
         texttype: Optional[int] = None,
-    ) -> list[Label]: ...
+    ) -> List[Label]: ...
     def get_paths(
         self,
         apply_repetitions: bool = True,
         depth: Optional[int] = None,
         layer: Optional[int] = None,
         datatype: Optional[int] = None,
-    ) -> list[RobustPath | FlexPath]: ...
+    ) -> List[Union[RobustPath, FlexPath]]: ...
     def get_polygons(
         self,
         apply_repetitions: bool = True,
@@ -546,11 +529,11 @@ class Reference:
         depth: Optional[int] = None,
         layer: Optional[int] = None,
         datatype: Optional[int] = None,
-    ) -> list[Polygon]: ...
-    def get_property(self, name: str) -> Optional[list[list[str | bytes | float]]]: ...
+    ) -> List[Polygon]: ...
+    def get_property(self, name: str) -> Optional[List[List[Union[str, bytes, float]]]]: ...
     def set_gds_property(self, attr: int, value: str) -> Self: ...
     def set_property(
-        self, name: str, value: str | bytes | float | Sequence[str | bytes | float]
+        self, name: str, value: Union[str, bytes, float, Sequence[Union[str, bytes, float]]]
     ) -> Self: ...
 
 class Repetition:
@@ -558,36 +541,33 @@ class Repetition:
     offsets: Optional[numpy.ndarray[Any, numpy.dtype[numpy.float64]]]
     rows: Optional[int]
     size: int
-    spacing: Optional[tuple[float, float]]
-    v1: Optional[tuple[float, float]]
-    v2: Optional[tuple[float, float]]
+    spacing: Optional[Tuple[float, float]]
+    v1: Optional[Tuple[float, float]]
+    v2: Optional[Tuple[float, float]]
     x_offsets: Optional[numpy.ndarray[Any, numpy.dtype[numpy.float64]]]
     y_offsets: Optional[numpy.ndarray[Any, numpy.dtype[numpy.float64]]]
     def __init__(
         self,
         columns: Optional[int] = None,
         rows: Optional[int] = None,
-        spacing: Optional[tuple[float, float] | complex] = None,
-        v1: Optional[tuple[float, float] | complex] = None,
-        v2: Optional[tuple[float, float] | complex] = None,
-        offsets: Optional[Sequence[tuple[float, float] | complex]] = None,
+        spacing: Optional[Union[Tuple[float, float], complex]] = None,
+        v1: Optional[Union[Tuple[float, float], complex]] = None,
+        v2: Optional[Union[Tuple[float, float], complex]] = None,
+        offsets: Optional[Sequence[Union[Tuple[float, float], complex]]] = None,
         x_offsets: Optional[Sequence[float]] = None,
         y_offsets: Optional[Sequence[float]] = None,
     )-> None: ...
     def get_offsets(self) -> numpy.ndarray[Any, numpy.dtype[numpy.float64]]: ...
 
 class RobustPath:
-    datatypes: tuple[int, ...]
-    ends: tuple[
-        Literal["flush", "extended", "round", "smooth"]
-        | tuple[float, float]
-        | Callable[[float, float, float, float], Sequence[complex | tuple[float, float]]],
-        ...,
-    ]
-    layers: tuple[int, ...]
+    datatypes: Tuple[int, ...]
+    ends: Tuple[
+        Union[Literal["flush", "extended", "round", "smooth", Tuple[float, float]], Callable[[float, float, float, float], Sequence[Union[complex, Tuple[float, float]]]]],
+        ...]
+    layers: Tuple[int, ...]
     max_evals: int
     num_paths: int
-    properties: list[list[str | bytes | float]]
+    properties: List[List[Union[str, bytes, float]]]
     repetition: Repetition
     scale_width: bool
     simple_path: bool
@@ -595,294 +575,205 @@ class RobustPath:
     tolerance: float
     def __init__(
         self,
-        initial_point: tuple[float, float] | complex,
-        width: float | Sequence[float],
-        offset: float | Sequence[float] = 0,
-        ends: Sequence[
-            Literal["flush", "extended", "round", "smooth"]
-            | tuple[float, float]
-            | Callable[[float, float, float, float], Sequence[complex | tuple[float, float]]]
-        ]
-        | Literal["flush", "extended", "round", "smooth"]
-        | tuple[float, float]
-        | Callable[[float, float, float, float], Sequence[complex | tuple[float, float]]] = "flush",
+        initial_point: Union[Tuple[float, float], complex],
+        width: Union[float, Sequence[float]],
+        offset: Union[float, Sequence[float]] = 0,
+        ends: Union[Union[Sequence[
+            Union[Union[Literal["flush", "extended", "round", "smooth", Tuple[float, float]], Callable[[float, float, float, float], Sequence[Union[complex, Tuple[float, float]]]]]
+        ], Literal["flush", "extended", "round", "smooth"]], Tuple[float, float]], Callable[[float, float, float, float], Sequence[Union[complex, Tuple[float, float]]]]] = "flush",
         tolerance: float = 1e-2,
         max_evals: int = 1000,
         simple_path: bool = False,
         scale_width: bool = True,
-        layer: int | list[int] = 0,
-        datatype: int | list[int] = 0,
+        layer: Union[int, List[int]] = 0,
+        datatype: Union[int, List[int]] = 0,
     )->None: ...
-    def apply_repetition(self) -> list[Self]: ...
+    def apply_repetition(self) -> List[Self]: ...
     def arc(
         self,
-        radius: float | tuple[float, float],
+        radius: Union[float, Tuple[float, float]],
         initial_angle: float,
         final_angle: float,
         rotation: float = 0,
-        width: Optional[float]
-        | tuple[float, Literal["constant", "linear", "smooth"]]
-        | Callable[[float], float]
-        | Sequence[
-            float | tuple[float, Literal["constant", "linear", "smooth"]] | Callable[[float], float]
-        ] = None,
-        offset: Optional[float]
-        | tuple[float, Literal["constant", "linear", "smooth"]]
-        | Callable[[float], float]
-        | Sequence[
-            float | tuple[float, Literal["constant", "linear", "smooth"]] | Callable[[float], float]
-        ] = None,
+        width: Union[Optional[float, Tuple[float, Literal["constant", "linear", "smooth"]], Callable[[float], float]], Sequence[
+            Union[float, Tuple[float, Literal["constant", "linear", "smooth"]], Callable[[float], float]]
+        ]] = None,
+        offset: Union[Optional[float, Tuple[float, Literal["constant", "linear", "smooth"]], Callable[[float], float]], Sequence[
+            Union[float, Tuple[float, Literal["constant", "linear", "smooth"]], Callable[[float], float]]
+        ]] = None,
     ) -> Self: ...
     def bezier(
         self,
-        xy: Sequence[tuple[float, float] | complex],
-        width: Optional[float]
-        | tuple[float, Literal["constant", "linear", "smooth"]]
-        | Callable[[float], float]
-        | Sequence[
-            float | tuple[float, Literal["constant", "linear", "smooth"]] | Callable[[float], float]
-        ] = None,
-        offset: Optional[float]
-        | tuple[float, Literal["constant", "linear", "smooth"]]
-        | Callable[[float], float]
-        | Sequence[
-            float | tuple[float, Literal["constant", "linear", "smooth"]] | Callable[[float], float]
-        ] = None,
+        xy: Sequence[Union[Tuple[float, float], complex]],
+        width: Union[Optional[float, Tuple[float, Literal["constant", "linear", "smooth"]], Callable[[float], float]], Sequence[
+            Union[float, Tuple[float, Literal["constant", "linear", "smooth"]], Callable[[float], float]]
+        ]] = None,
+        offset: Union[Optional[float, Tuple[float, Literal["constant", "linear", "smooth"]], Callable[[float], float]], Sequence[
+            Union[float, Tuple[float, Literal["constant", "linear", "smooth"]], Callable[[float], float]]
+        ]] = None,
         relative: bool = False,
     ) -> Self: ...
-    def commands(self, *args: str | float) -> Self: ...
+    def commands(self, *args: Union[str, float]) -> Self: ...
     def copy(self) -> Self: ...
     def cubic(
         self,
-        xy: Sequence[tuple[float, float]],
-        width: Optional[float]
-        | tuple[float, Literal["constant", "linear", "smooth"]]
-        | Callable[[float], float]
-        | Sequence[
-            float | tuple[float, Literal["constant", "linear", "smooth"]] | Callable[[float], float]
-        ] = None,
-        offset: Optional[float]
-        | tuple[float, Literal["constant", "linear", "smooth"]]
-        | Callable[[float], float]
-        | Sequence[
-            float | tuple[float, Literal["constant", "linear", "smooth"]] | Callable[[float], float]
-        ] = None,
+        xy: Sequence[Tuple[float, float]],
+        width: Union[Optional[float, Tuple[float, Literal["constant", "linear", "smooth"]], Callable[[float], float]], Sequence[
+            Union[float, Tuple[float, Literal["constant", "linear", "smooth"]], Callable[[float], float]]
+        ]] = None,
+        offset: Union[Optional[float, Tuple[float, Literal["constant", "linear", "smooth"]], Callable[[float], float]], Sequence[
+            Union[float, Tuple[float, Literal["constant", "linear", "smooth"]], Callable[[float], float]]
+        ]] = None,
         relative: bool = False,
     ) -> Self: ...
     def cubic_smooth(
         self,
-        xy: Sequence[tuple[float, float]],
-        width: Optional[float]
-        | tuple[float, Literal["constant", "linear", "smooth"]]
-        | Callable[[float], float]
-        | Sequence[
-            float | tuple[float, Literal["constant", "linear", "smooth"]] | Callable[[float], float]
-        ] = None,
-        offset: Optional[float]
-        | tuple[float, Literal["constant", "linear", "smooth"]]
-        | Callable[[float], float]
-        | Sequence[
-            float | tuple[float, Literal["constant", "linear", "smooth"]] | Callable[[float], float]
-        ] = None,
+        xy: Sequence[Tuple[float, float]],
+        width: Union[Optional[float, Tuple[float, Literal["constant", "linear", "smooth"]], Callable[[float], float]], Sequence[
+            Union[float, Tuple[float, Literal["constant", "linear", "smooth"]], Callable[[float], float]]
+        ]] = None,
+        offset: Union[Optional[float, Tuple[float, Literal["constant", "linear", "smooth"]], Callable[[float], float]], Sequence[
+            Union[float, Tuple[float, Literal["constant", "linear", "smooth"]], Callable[[float], float]]
+        ]] = None,
         relative: bool = False,
     ) -> Self: ...
     def delete_gds_property(self, attr: int) -> Self: ...
     def delete_property(self, name: str) -> Self: ...
     def get_gds_property(self, attr: int) -> Optional[str]: ...
-    def get_property(self, name: str) -> Optional[list[list[str | bytes | float]]]: ...
+    def get_property(self, name: str) -> Optional[List[List[Union[str, bytes, float]]]]: ...
     def gradient(self, u: float, from_below: bool = True) -> numpy.ndarray[Any, numpy.dtype[numpy.float64]]: ...
     def horizontal(
         self,
         x: float,
-        width: Optional[float]
-        | tuple[float, Literal["constant", "linear", "smooth"]]
-        | Callable[[float], float]
-        | Sequence[
-            float | tuple[float, Literal["constant", "linear", "smooth"]] | Callable[[float], float]
-        ] = None,
-        offset: Optional[float]
-        | tuple[float, Literal["constant", "linear", "smooth"]]
-        | Callable[[float], float]
-        | Sequence[
-            float | tuple[float, Literal["constant", "linear", "smooth"]] | Callable[[float], float]
-        ] = None,
+        width: Union[Optional[float, Tuple[float, Literal["constant", "linear", "smooth"]], Callable[[float], float]], Sequence[
+            Union[float, Tuple[float, Literal["constant", "linear", "smooth"]], Callable[[float], float]]
+        ]] = None,
+        offset: Union[Optional[float, Tuple[float, Literal["constant", "linear", "smooth"]], Callable[[float], float]], Sequence[
+            Union[float, Tuple[float, Literal["constant", "linear", "smooth"]], Callable[[float], float]]
+        ]] = None,
         relative: bool = False,
     ) -> Self: ...
     def interpolation(
         self,
-        points: Sequence[tuple[float, float] | complex],
+        points: Sequence[Union[Tuple[float, float], complex]],
         angles: Optional[Sequence[float]] = None,
-        tension_in: float | Sequence[float] = 1,
-        tension_out: float | Sequence[float] = 1,
+        tension_in: Union[float, Sequence[float]] = 1,
+        tension_out: Union[float, Sequence[float]] = 1,
         initial_curl: float = 1,
         final_curl: float = 1,
         cycle: bool = False,
-        width: Optional[float]
-        | tuple[float, Literal["constant", "linear", "smooth"]]
-        | Callable[[float], float]
-        | Sequence[
-            float | tuple[float, Literal["constant", "linear", "smooth"]] | Callable[[float], float]
-        ] = None,
-        offset: Optional[float]
-        | tuple[float, Literal["constant", "linear", "smooth"]]
-        | Callable[[float], float]
-        | Sequence[
-            float | tuple[float, Literal["constant", "linear", "smooth"]] | Callable[[float], float]
-        ] = None,
+        width: Union[Optional[float, Tuple[float, Literal["constant", "linear", "smooth"]], Callable[[float], float]], Sequence[
+            Union[float, Tuple[float, Literal["constant", "linear", "smooth"]], Callable[[float], float]]
+        ]] = None,
+        offset: Union[Optional[float, Tuple[float, Literal["constant", "linear", "smooth"]], Callable[[float], float]], Sequence[
+            Union[float, Tuple[float, Literal["constant", "linear", "smooth"]], Callable[[float], float]]
+        ]] = None,
         relative: bool = True,
     ) -> Self: ...
     def mirror(
-        self, p1: tuple[float, float] | complex, p2: tuple[float, float] | complex = (0, 0)
+        self, p1: Union[Tuple[float, float], complex], p2: Union[Tuple[float, float], complex] = (0, 0)
     ) -> Self: ...
     def offsets(self, u: float, from_below: bool = True) -> numpy.ndarray[Any, numpy.dtype[numpy.float64]]: ...
     def parametric(
         self,
-        path_function: Callable[[float], tuple[float, float] | complex],
-        path_gradient: Optional[Callable[[float], tuple[float, float] | complex]] = None,
-        width: Optional[float]
-        | tuple[float, Literal["constant", "linear", "smooth"]]
-        | Callable[[float], float]
-        | Sequence[
-            float | tuple[float, Literal["constant", "linear", "smooth"]] | Callable[[float], float]
-        ] = None,
-        offset: Optional[float]
-        | tuple[float, Literal["constant", "linear", "smooth"]]
-        | Callable[[float], float]
-        | Sequence[
-            float | tuple[float, Literal["constant", "linear", "smooth"]] | Callable[[float], float]
-        ] = None,
+        path_function: Callable[[float], Union[Tuple[float, float], complex]],
+        path_gradient: Optional[Callable[[float], Union[Tuple[float, float], complex]]] = None,
+        width: Union[Optional[float, Tuple[float, Literal["constant", "linear", "smooth"]], Callable[[float], float]], Sequence[
+            Union[float, Tuple[float, Literal["constant", "linear", "smooth"]], Callable[[float], float]]
+        ]] = None,
+        offset: Union[Optional[float, Tuple[float, Literal["constant", "linear", "smooth"]], Callable[[float], float]], Sequence[
+            Union[float, Tuple[float, Literal["constant", "linear", "smooth"]], Callable[[float], float]]
+        ]] = None,
         relative: bool = True,
     ) -> Self: ...
-    def path_spines(self) -> list[numpy.ndarray[Any, numpy.dtype[numpy.float64]]]: ...
+    def path_spines(self) -> List[numpy.ndarray[Any, numpy.dtype[numpy.float64]]]: ...
     def position(self, u: float, from_below: bool = True) -> numpy.ndarray[Any, numpy.dtype[numpy.float64]]: ...
     def quadratic(
         self,
-        xy: Sequence[tuple[float, float] | complex],
-        width: Optional[float]
-        | tuple[float, Literal["constant", "linear", "smooth"]]
-        | Callable[[float], float]
-        | Sequence[
-            float | tuple[float, Literal["constant", "linear", "smooth"]] | Callable[[float], float]
-        ] = None,
-        offset: Optional[float]
-        | tuple[float, Literal["constant", "linear", "smooth"]]
-        | Callable[[float], float]
-        | Sequence[
-            float | tuple[float, Literal["constant", "linear", "smooth"]] | Callable[[float], float]
-        ] = None,
+        xy: Sequence[Union[Tuple[float, float], complex]],
+        width: Union[Optional[float, Tuple[float, Literal["constant", "linear", "smooth"]], Callable[[float], float]], Sequence[
+            Union[float, Tuple[float, Literal["constant", "linear", "smooth"]], Callable[[float], float]]
+        ]] = None,
+        offset: Union[Optional[float, Tuple[float, Literal["constant", "linear", "smooth"]], Callable[[float], float]], Sequence[
+            Union[float, Tuple[float, Literal["constant", "linear", "smooth"]], Callable[[float], float]]
+        ]] = None,
         relative: bool = False,
     ) -> Self: ...
     def quadratic_smooth(
         self,
-        xy: tuple[float, float] | complex,
-        width: Optional[float]
-        | tuple[float, Literal["constant", "linear", "smooth"]]
-        | Callable[[float], float]
-        | Sequence[
-            float | tuple[float, Literal["constant", "linear", "smooth"]] | Callable[[float], float]
-        ] = None,
-        offset: Optional[float]
-        | tuple[float, Literal["constant", "linear", "smooth"]]
-        | Callable[[float], float]
-        | Sequence[
-            float | tuple[float, Literal["constant", "linear", "smooth"]] | Callable[[float], float]
-        ] = None,
+        xy: Union[Tuple[float, float], complex],
+        width: Union[Optional[float, Tuple[float, Literal["constant", "linear", "smooth"]], Callable[[float], float]], Sequence[
+            Union[float, Tuple[float, Literal["constant", "linear", "smooth"]], Callable[[float], float]]
+        ]] = None,
+        offset: Union[Optional[float, Tuple[float, Literal["constant", "linear", "smooth"]], Callable[[float], float]], Sequence[
+            Union[float, Tuple[float, Literal["constant", "linear", "smooth"]], Callable[[float], float]]
+        ]] = None,
         relative: bool = False,
     ) -> Self: ...
-    def rotate(self, angle: float, center: tuple[float, float] | complex = (0, 0)) -> Self: ...
-    def scale(self, s: float, center: tuple[float, float] | complex = (0, 0)) -> Self: ...
+    def rotate(self, angle: float, center: Union[Tuple[float, float], complex] = (0, 0)) -> Self: ...
+    def scale(self, s: float, center: Union[Tuple[float, float], complex] = (0, 0)) -> Self: ...
     def segment(
         self,
-        xy: tuple[float, float] | complex,
-        width: Optional[float]
-        | tuple[float, Literal["constant", "linear", "smooth"]]
-        | Callable[[float], float]
-        | Sequence[
-            float | tuple[float, Literal["constant", "linear", "smooth"]] | Callable[[float], float]
-        ] = None,
-        offset: Optional[float]
-        | tuple[float, Literal["constant", "linear", "smooth"]]
-        | Callable[[float], float]
-        | Sequence[
-            float | tuple[float, Literal["constant", "linear", "smooth"]] | Callable[[float], float]
-        ] = None,
+        xy: Union[Tuple[float, float], complex],
+        width: Union[Optional[float, Tuple[float, Literal["constant", "linear", "smooth"]], Callable[[float], float]], Sequence[
+            Union[float, Tuple[float, Literal["constant", "linear", "smooth"]], Callable[[float], float]]
+        ]] = None,
+        offset: Union[Optional[float, Tuple[float, Literal["constant", "linear", "smooth"]], Callable[[float], float]], Sequence[
+            Union[float, Tuple[float, Literal["constant", "linear", "smooth"]], Callable[[float], float]]
+        ]] = None,
         relative: bool = False,
     ) -> Self: ...
     def set_datatypes(self, *datatypes: int) -> Self: ...
     def set_ends(
         self,
-        *ends: Literal["flush", "extended", "round", "smooth"]
-        | tuple[float, float]
-        | Callable[[float, float, float, float], float],
+        *ends: Union[Literal["flush", "extended", "round", "smooth", Tuple[float, float]], Callable[[float, float, float, float], float]],
     ) -> Self: ...
     def set_gds_property(self, attr: int, value: str) -> Self: ...
     def set_layers(self, *layers: int) -> Self: ...
     def set_property(
-        self, name: str, value: str | bytes | float | Sequence[str | bytes | float]
+        self, name: str, value: Union[str, bytes, float, Sequence[Union[str, bytes, float]]]
     ) -> Self: ...
     def spine(self) -> numpy.ndarray[Any, numpy.dtype[numpy.float64]]: ...
-    def to_polygons(self) -> list[Polygon]: ...
+    def to_polygons(self) -> List[Polygon]: ...
     def translate(
-        self, dx: float | tuple[float, float] | complex, dy: Optional[float] = None
+        self, dx: Union[Union[float, Tuple[float, float]], complex], dy: Optional[float] = None
     ) -> Self: ...
     def turn(
         self,
         radius: float,
         angle: float,
-        width: Optional[float] | Sequence[float] = None,
-        offset: Optional[float] | Sequence[float] = None,
+        width: Union[Optional[float], Sequence[float]] = None,
+        offset: Union[Optional[float], Sequence[float]] = None,
     ) -> Self: ...
     def vertical(
         self,
         y: float,
-        width: Optional[float]
-        | tuple[float, Literal["constant", "linear", "smooth"]]
-        | Callable[[float], float]
-        | Sequence[
-            float | tuple[float, Literal["constant", "linear", "smooth"]] | Callable[[float], float]
-        ] = None,
-        offset: Optional[float]
-        | tuple[float, Literal["constant", "linear", "smooth"]]
-        | Callable[[float], float]
-        | Sequence[
-            float | tuple[float, Literal["constant", "linear", "smooth"]] | Callable[[float], float]
-        ] = None,
+        width: Union[Optional[float, Tuple[float, Literal["constant", "linear", "smooth"]], Callable[[float], float]], Sequence[
+            Union[float, Tuple[float, Literal["constant", "linear", "smooth"]], Callable[[float], float]]
+        ]] = None,
+        offset: Union[Optional[float, Tuple[float, Literal["constant", "linear", "smooth"]], Callable[[float], float]], Sequence[
+            Union[float, Tuple[float, Literal["constant", "linear", "smooth"]], Callable[[float], float]]
+        ]] = None,
         relative: bool = False,
     ) -> Self: ...
     def widths(self, u: float, from_below: bool = True) -> numpy.ndarray[Any, numpy.dtype[numpy.float64]]: ...
 
 def all_inside(
-    points: Sequence[tuple[float, float] | complex],
-    polygons: Polygon
-    | FlexPath
-    | RobustPath
-    | Reference
-    | Sequence[Polygon | FlexPath | RobustPath | Reference],
+    points: Sequence[Union[Tuple[float, float], complex]],
+    polygons: Union[Polygon, FlexPath, RobustPath, Reference, Sequence[Union[Polygon, FlexPath, RobustPath, Reference]]],
 ) -> bool: ...
 def any_inside(
-    points: Sequence[tuple[float, float] | complex],
-    polygons: Polygon
-    | FlexPath
-    | RobustPath
-    | Reference
-    | Sequence[Polygon | FlexPath | RobustPath | Reference],
+    points: Sequence[Union[Tuple[float, float], complex]],
+    polygons: Union[Polygon, FlexPath, RobustPath, Reference, Sequence[Union[Polygon, FlexPath, RobustPath, Reference]]],
 ) -> bool: ...
 def boolean(
-    operand1: Polygon
-    | FlexPath
-    | RobustPath
-    | Reference
-    | Sequence[Polygon | FlexPath | RobustPath | Reference],
-    operand2: Polygon
-    | FlexPath
-    | RobustPath
-    | Reference
-    | Sequence[Polygon | FlexPath | RobustPath | Reference],
+    operand1: Union[Polygon, FlexPath, RobustPath, Reference, Sequence[Union[Polygon, FlexPath, RobustPath, Reference]]],
+    operand2: Union[Polygon, FlexPath, RobustPath, Reference, Sequence[Union[Polygon, FlexPath, RobustPath, Reference]]],
     operation: Literal["or", "and", "xor", "not"],
     precision: float = 1e-3,
     layer: int = 0,
     datatype: int = 0,
-) -> list[Polygon]: ...
+) -> List[Polygon]: ...
 def contour(
     data: ArrayLike, # type: ignore
     level: int = 0,
@@ -890,44 +781,36 @@ def contour(
     precision: float = 0.01,
     layer: int = 0,
     datatype: int = 0,
-) -> list[Polygon]: ...
+) -> List[Polygon]: ...
 def cross(
-    center: tuple[float, float] | complex,
+    center: Union[Tuple[float, float], complex],
     full_size: float,
     arm_width: float,
     layer: int = 0,
     datatype: int = 0,
 ) -> Polygon: ...
 def ellipse(
-    center: tuple[float, float] | complex,
-    radius: float | tuple[float, float],
-    inner_radius: Optional[float] | tuple[float, float] = None,
+    center: Union[Tuple[float, float], complex],
+    radius: Union[float, Tuple[float, float]],
+    inner_radius: Union[Optional[float], Tuple[float, float]] = None,
     initial_angle: float = 0,
     final_angle: float = 0,
     tolerance: float = 0.01,
     layer: int = 0,
     datatype: int = 0,
 ) -> Polygon: ...
-def gds_info(infile: str | pathlib.Path) -> dict[str, Any]: ...
+def gds_info(infile: Union[str, pathlib.Path]) -> Dict[str, Any]: ...
 
-# def gds_timestamp(filename: str | pathlib.Path, timestamp:Optional[datetime.datetime]=None) -> datetime.datetime: ...
-def gds_units(infile: str | pathlib.Path) -> tuple[float, float]: ...
+# def gds_timestamp(filename: Union[str, pathlib.Path], timestamp:Optional[datetime.datetime]=None) -> datetime.datetime: ...
+def gds_units(infile: Union[str, pathlib.Path]) -> Tuple[float, float]: ...
 def inside(
-    points: Sequence[tuple[float, float] | complex],
-    polygons: Polygon
-    | FlexPath
-    | RobustPath
-    | Reference
-    | Sequence[Polygon | FlexPath | RobustPath | Reference],
-) -> tuple[bool, ...]: ...
-def oas_precision(infile: str | pathlib.Path) -> float: ...
-def oas_validate(infile: str | pathlib.Path) -> tuple[bool, int]: ...
+    points: Sequence[Union[Tuple[float, float], complex]],
+    polygons: Union[Polygon, FlexPath, RobustPath, Reference, Sequence[Union[Polygon, FlexPath, RobustPath, Reference]]],
+) -> Tuple[bool, ...]: ...
+def oas_precision(infile: Union[str, pathlib.Path]) -> float: ...
+def oas_validate(infile: Union[str, pathlib.Path]) -> Tuple[bool, int]: ...
 def offset(
-    polygons: Polygon
-    | FlexPath
-    | RobustPath
-    | Reference
-    | Sequence[Polygon | FlexPath | RobustPath | Reference],
+    polygons: Union[Polygon, FlexPath, RobustPath, Reference, Sequence[Union[Polygon, FlexPath, RobustPath, Reference]]],
     distance: float,
     join: Literal["miter", "bevel", "round"] = "miter",
     tolerance: int = 2,
@@ -935,9 +818,9 @@ def offset(
     use_union: bool = False,
     layer: int = 0,
     datatype: int = 0,
-) -> list[Polygon]: ...
+) -> List[Polygon]: ...
 def racetrack(
-    center: tuple[float, float] | complex,
+    center: Union[Tuple[float, float], complex],
     straight_length: float,
     radius: float,
     inner_radius: float = 0,
@@ -947,21 +830,21 @@ def racetrack(
     datatype: int = 0,
 ) -> Polygon: ...
 def read_gds(
-    infile: str | pathlib.Path,
+    infile: Union[str, pathlib.Path],
     unit: float = 0,
     tolerance: float = 0,
-    filter: Optional[Iterable[tuple[int, int]]] = None,
+    filter: Optional[Iterable[Tuple[int, int]]] = None,
 ) -> Library: ...
-def read_oas(infile: str | pathlib.Path, unit: float = 0, tolerance: float = 0) -> Library: ...
-def read_rawcells(infile: str | pathlib.Path) -> dict[str, RawCell]: ...
+def read_oas(infile: Union[str, pathlib.Path], unit: float = 0, tolerance: float = 0) -> Library: ...
+def read_rawcells(infile: Union[str, pathlib.Path]) -> Dict[str, RawCell]: ...
 def rectangle(
-    corner1: tuple[float, float] | complex,
-    corner2: tuple[float, float] | complex,
+    corner1: Union[Tuple[float, float], complex],
+    corner2: Union[Tuple[float, float], complex],
     layer: int = 0,
     datatype: int = 0,
 ) -> Polygon: ...
 def regular_polygon(
-    center: tuple[float, float] | complex,
+    center: Union[Tuple[float, float], complex],
     side_length: float,
     sides: int,
     rotation: float = 0,
@@ -969,20 +852,16 @@ def regular_polygon(
     datatype: int = 0,
 ) -> Polygon: ...
 def slice(
-    polygons: Polygon
-    | FlexPath
-    | RobustPath
-    | Reference
-    | Sequence[Polygon | FlexPath | RobustPath | Reference],
-    position: float | Sequence[float],
+    polygons: Union[Polygon, FlexPath, RobustPath, Reference, Sequence[Union[Polygon, FlexPath, RobustPath, Reference]]],
+    position: Union[float, Sequence[float]],
     axis: Literal["x", "y"],
     precision: float = 1e-3,
-) -> list[list[Polygon]]: ...
+) -> List[List[Polygon]]: ...
 def text(
     text: str,
     size: float,
-    position: tuple[float, float] | complex,
+    position: Union[Tuple[float, float], complex],
     vertical: bool = False,
     layer: int = 0,
     datatype: int = 0,
-) -> list[Polygon]: ...
+) -> List[Polygon]: ...
